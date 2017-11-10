@@ -208,10 +208,10 @@ for index in [0..2]
 
 # Move to Pill info
 Pill_Info.onClick (event, layer) ->
-	flow.showNext(Pill_Information)
+	flow.showOverlayBottom(Pill_Information)
 	
 Return_home.onClick (event, layer) ->
-	flow.showOverlayLeft(Home_Screen_layer)
+	flow.showOverlayTop(Home_Screen_layer)
 
 info_scroll = new ScrollComponent
 	width:375
@@ -317,10 +317,6 @@ Home_Screen.onSwipeRight (event, layer) ->
 	vertpos = scroll_home.scrollY
 	scroll_calendar.scrollPoint = {x:0,y:vertpos}
 
-Calendar.onClick (event,layer) ->
-	flow.showOverlayLeft(DailySchedule)
-	vertpos = scroll_home.scrollY
-	scroll_calendar.scrollPoint = {x:0,y:vertpos}
 
 DailySchedule.onSwipeLeft (event,layer) ->
 	flow.showPrevious()
