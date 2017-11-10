@@ -158,10 +158,22 @@ for index in [0..2]
 	Pillscheduled[index].onLongPressStart (event, layer) ->
 		scroll.scrollVertical=false
 		ind = Pillscheduled.indexOf(this)
+		this.draggable.enabled=true
+		this.draggable.horizontal=false
+		this.draggable.constraints=
+			x:Timewindow[ind].x
+			y:Timewindow[ind].y
+			width:Timewindow[ind].width
+			height:Timewindow[ind].height
+		this.draggable.overdrag=false
+		this.draggable.momentum=false
+		
 		Timewindow[ind].states.switchInstant "appear"
 
 	Pillscheduled[index].onLongPressEnd (event, layer) ->
+		scroll.scrollVertical=true
 		ind = Pillscheduled.indexOf(this)
+		this.draggable.enabled=false
 		Timewindow[ind].states.switchInstant "default"
 		
 		
