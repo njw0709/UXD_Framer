@@ -31,6 +31,8 @@ Home_Screen.parent=scroll_home.content
 Time_pacman.parent=scroll_home.content
 Pill_Info.parent=scroll_home.content
 
+screenOffset = 0
+
 # Button to transition to pill info list, fixed to position
 scroll_home.on Events.Move, (offset) ->
 	yOffset = -offset.y
@@ -96,19 +98,28 @@ Pacman.draggable.momentum=false
 Pillsavail = [Pill2, Pill3, Pill4]
 Pillsnotavail = [Pill1, Pill5]
 
-for index in [0..1]
-	Pillsnotavail[index].states=
-			cannottake:
-				opacity: 0.75
+for pill in Pillsavail
+	pill.states=
 			default:
 				opacity: 1
+			taken:
+				opacity: 0
+
+
+for pill in Pillsnotavail
+	pill.states=
+			default:
+				opacity: 1
+			cannottake:
+				opacity: 0.75
+
 
 # Default positions
 Pillsxpos=[]
 Pillsypos=[]
-for index in [0..2]
-	Pillsxpos.push(Pillsavail[index].x)
-	Pillsypos.push(Pillsavail[index].y)
+for pill in Pillsavail
+	Pillsxpos.push(pill.x)
+	Pillsypos.push(pill.y)
 
 Diff=[]
 
@@ -121,14 +132,16 @@ Confimation_popup.states =
 Pacman.on Events.DragStart, ->
 	scroll_home.scrollVertical=false
 
-	for index in [0..1]
-		Pillsnotavail[index].states.switchInstant "cannottake"
-	for index in [0..2]
+	for pill in Pillsnotavail
+		pill.states.switchInstant "cannottake"
+
+	for index in [0..Pillsavail.length-1]
 		Pillsavail[index].animate
 			x:90
 			y:Pillsypos[index] + index * 60
 			options:
 				time: 0.5
+
 	Pillsavail[2].animate
 		x:90
 		y:Pillsypos[2]
@@ -138,28 +151,29 @@ Pacman.on Events.DragStart, ->
 pacmanXTrail = []
 pacmanYTrail = []
 touchedPillsIdcs = []
+untouchedPillsIdcs = []
 
 touch_counter = 0
 Pacman.on Events.DragMove, ->
 	pacmanXTrail.push(this.screenFrame.x)
 	pacmanYTrail.push(this.screenFrame.y)
-	# print pacmanXTrail.length
-	for index in [0..Pillsavail.length-1]
-		Pillsavail[index].on "change:point", ->
-		# print "In touchedPills: #{index in touchedPillsIdcs}; isTouching: #{isTouching(Pacman,Pillsavail[index])}"
-		if (not (index in touchedPillsIdcs)) and isTouching(Pacman,Pillsavail[index])
+
+	for pill in Pillsavail
+		index = Pillsavail.indexOf(pill)
+		pill.on "change:point", ->
+		if (not (index in touchedPillsIdcs)) and isTouching(Pacman,pill) and pill.states.current.name != "taken"
 			touch_counter += 1
-			print "Touched pill#{index} \##{touch_counter}"
 			touchedPillsIdcs.push(index)
 
-	print "touchedPillsIdcs: #{touchedPillsIdcs}"
 	caterpillarPosition = 0
 	for pillIdx in touchedPillsIdcs
-		print "Moving pill\##{pillIdx}"
-		Pillsavail[pillIdx].animate
-			x: pacmanXTrail[pacmanXTrail.length - 2 * caterpillarPosition] + 10
-			y: pacmanYTrail[pacmanYTrail.length - 2 * caterpillarPosition]
-			opacity: 0.8
+		# TODO: This currently assumes there will always be enough trail, might need to add a check
+		pill = Pillsavail[pillIdx]
+		yOffset = pill.y - pill.screenFrame.y
+		pill.animate
+			x: pacmanXTrail[(pacmanXTrail.length - 1) - 5 * caterpillarPosition] + 10
+			y: pacmanYTrail[(pacmanYTrail.length - 1) - 5 * caterpillarPosition] + yOffset
+			opacity: 0.75
 			options:
 				time: 0.1
 
@@ -167,19 +181,19 @@ Pacman.on Events.DragMove, ->
 
 
 Pacman.on Events.DragEnd, ->
-	pacmanXTrail = []
-	pacmanYTrail = []
-	touchedPillsIdcs = []
-
-	for index in [0..1]
+	for index in [0..Pillsnotavail.length-1]
 		Pillsnotavail[index].states.switchInstant "default"
-	for index in [0..2]
-		Pillsavail[index].animate
-			x:Pillsxpos[index]
-			y:Pillsypos[index]
-			options:
-				curve: Spring(damping: 0.5)
-				time: 0.5
+
+	for index in [0..Pillsavail.length-1]
+		pill = Pillsavail[index]
+		if index not in touchedPillsIdcs and pill.states.current.name != "taken"
+			pill.animate
+				x:Pillsxpos[index]
+				y:Pillsypos[index]
+				opacity: 1
+				options:
+					curve: Spring(damping: 0.5)
+					time: 0.5
 
 	this.animate
 		x:311
@@ -188,7 +202,11 @@ Pacman.on Events.DragEnd, ->
 			curve: Spring(damping: 0.5)
 			time:0.5
 
-	Confimation_popup.states.switchInstant "popup"
+	if touchedPillsIdcs.length > 0
+		Confimation_popup.states.switchInstant "popup"
+
+	pacmanXTrail = []
+	pacmanYTrail = []
 
 	scroll_home.scrollVertical=true
 
@@ -200,23 +218,44 @@ for box in checkboxes
 			opacity:1
 		uncheck:
 			opacity:0
+
+	idx = checkboxes.indexOf(this)
 	box.on Events.Click,->
-		ind = checkboxes.indexOf(this)
-		counters[ind]=counters[ind]+1
-		if counters[ind] %%2 == 0
+		counters[idx]=counters[idx]+1
+		if counters[idx] %%2 == 0
 			this.states.switchInstant "default"
 		else
+			untouchedPillsIdcs.push(touchedPillsIdcs.pop())
+			 # TODO: Map to actual pill
 			this.states.switchInstant "uncheck"
 
-
+# TODO: Lock all actions outside of buttons when confirmation screen is up
 No_Take.onClick (event, layer) ->
+	untouchedPillsIdcs = touchedPillsIdcs
+	moveUntouchedPills()
+	touchedPillsIdcs = []
+	untouchedPillsIdcs = []
 	Confimation_popup.states.switchInstant "default"
 
 Confirm_Take.onClick (event, layer) ->
+	for index in touchedPillsIdcs # TODO: Rethink what we want to do with taken pills
+		Pillsavail[index].states.switchInstant "taken"
+
+	moveUntouchedPills()
+	touchedPillsIdcs = []
+	untouchedPillsIdcs = []
 	Confimation_popup.states.switchInstant "default"
 
-
-
+moveUntouchedPills = () ->
+	if untouchedPillsIdcs.length != 0
+		for index in untouchedPillsIdcs
+			Pillsavail[index].animate
+				x:Pillsxpos[index]
+				y:Pillsypos[index]
+				opacity: 1
+				options:
+					curve: Spring(damping: 0.5)
+					time: 0.5
 
 #Collision Detection
 isTouching = (Pacman, Pill) ->
