@@ -1,26 +1,39 @@
 
 {StickyHeaders} = require "sticky-headers/StickyHeaders"
 # make the page scrollable
+
+Home_Screen_layer = new Layer
+	size:Screen.size
+	x:0
+	y:0
+
 flow = new FlowComponent
 Home_Screen.parent=flow
-flow.showNext(Home_Screen)
+flow.showNext(Home_Screen_layer)
 
 
-scroll = new ScrollComponent
-	size: Screen.size
+
+scroll_home = new ScrollComponent
+	x:0
+	y:0
+	width:375
+	height:667
 	scrollHorizontal: false
-scroll.parent = Home_Screen
-Calendar.parent=scroll.content
-Time_pacman.parent=scroll.content
-Pill_Info.parent=scroll.content
+	parent: Home_Screen_layer
+	mouseWheelEnabled: true
+
+Home_Screen.parent=scroll_home.content
+Time_pacman.parent=scroll_home.content
+Pill_Info.parent=scroll_home.content
+
 # Button to transition to pill info list, fixed to position
-scroll.on Events.Move, (offset) ->
+scroll_home.on Events.Move, (offset) ->
 	yOffset = -offset.y
 	Pill_Info.y=582+yOffset
 
 #scroll to current time 
-scroll.scrollToLayer(Time_pacman)
-scroll.mouseWheelEnabled=true
+scroll_home.scrollToLayer(Time_pacman)
+# scroll.mouseWheelEnabled=true
 
 #Define states for the time indicator
 CurrentTimeline.states = 
@@ -45,13 +58,12 @@ CurrentTime.states =
 Time_pacman.name="StickyHeader"
 
 # Enable StickyHeaders for your scroll component
-StickyHeaders.enableFor(scroll)
+StickyHeaders.enableFor(scroll_home)
 
 #make time indicator change colors when scrolled up far
-Current_x=Time_pacman.x
 Current_Time=Time_pacman.y
 
-scroll.onMove ->
+scroll_home.onMove ->
 	if Time_pacman.y > Current_Time
 		CurrentTimeline.states.switchInstant "future"
 		CurrentTime.states.switchInstant "future"
@@ -94,7 +106,7 @@ for index in [0..2]
 
 Diff=[]
 Pacman.on Events.DragStart, ->
-	scroll.scrollVertical=false
+	scroll_home.scrollVertical=false
 	for index in [0..1]
 		Pillsnotavail[index].states.switchInstant "cannottake"
 	for index in [0..2]
@@ -140,7 +152,7 @@ Pacman.on Events.DragEnd, ->
 			curve: Spring(damping: 0.5)
 			time:0.5
 			
-	scroll.scrollVertical=true
+	scroll_home.scrollVertical=true
 
 
 #Collision Detection
@@ -169,7 +181,7 @@ for index in [0..2]
 			opacity:1
 
 	Pillscheduled[index].onLongPressStart (event, layer) ->
-		scroll.scrollVertical=false
+		scroll_home.scrollVertical=false
 		ind = Pillscheduled.indexOf(this)
 		this.draggable.enabled=true
 		this.draggable.horizontal=false
@@ -184,7 +196,7 @@ for index in [0..2]
 		Timewindow[ind].states.switchInstant "appear"
 
 	Pillscheduled[index].onLongPressEnd (event, layer) ->
-		scroll.scrollVertical=true
+		scroll_home.scrollVertical=true
 		ind = Pillscheduled.indexOf(this)
 		this.draggable.enabled=false
 		Timewindow[ind].states.switchInstant "default"
@@ -199,7 +211,7 @@ Pill_Info.onClick (event, layer) ->
 	flow.showNext(Pill_Information)
 	
 Return_home.onClick (event, layer) ->
-	flow.showPrevious()
+	flow.showOverlayLeft(Home_Screen_layer)
 
 info_scroll = new ScrollComponent
 	width:375
@@ -218,6 +230,10 @@ BtCalendar.onClick (event,layer) ->
 
 BtMypills.onClick (event,layer) ->
 	flow.showPrevious()
+
+Pill_Information.onSwipeRight (event, layer) ->
+	flow.showPrevious()
+
 
 #Add Pill Sequence
 Addpill.onClick (event,layer) ->
@@ -242,12 +258,72 @@ Confirm_comp.on Events.Click, ->
 #Updated Pill List Definition
 
 Return_home_new.onClick (event, layer) ->
-	flow.showOverlayLeft(Home_Screen)
+	flow.showOverlayLeft(Home_Screen_layer)
+
+
+# Daily Calendar on Swipe right
+
+scroll_calendar = new ScrollComponent
+	x:0
+	y:0
+	width:375
+	height:667
+	scrollHorizontal: false
+	parent: Home_Screen_layer
+	mouseWheelEnabled: true
+
+scroll_calendar.parent = DailySchedule
+Calendar_expanded.parent = scroll_calendar.content
+Time_pacman_expanded.parent=scroll_calendar.content
+
+#Define states for the time indicator
+CurrentTimeline_exp.states = 
+	Now:
+		borderColor: "rgba(34,34,34,0.23)"
+		opacity: 1.00
+		backgroundColor: "rgba(0,0,0,1)"
+	future:
+		borderWidth: 3
+		borderColor: "rgba(34,34,34,0.23)"
+		opacity: 0.5
+
+# Make the pacman stick to the top when scrolled further
+Time_pacman_expanded.name="StickyHeader"
+
+# Enable StickyHeaders for your scroll component
+StickyHeaders.enableFor(scroll_calendar)
+
+#make time indicator change colors when scrolled up far
+Current_Time_exp=Time_pacman_expanded.y
+
+scroll_calendar.onMove ->
+	scroll_home.scrollPoint={x:0,y:scroll_calendar.scrollY}
+	if Time_pacman_expanded.y > Current_Time_exp
+		CurrentTimeline_exp.states.switchInstant "future"
+		Uparrow_exp.animate
+			opacity: 0.8
+			options:
+				time: 0.1
+	else
+		CurrentTimeline_exp.states.switchInstant "Now"
+		Uparrow_exp.animate
+			opacity: 0
+			options: 
+				time: 0
+
+
+Home_Screen.onSwipeRight (event, layer) ->
+	flow.showOverlayLeft(DailySchedule)
+	vertpos = scroll_home.scrollY
+	scroll_calendar.scrollPoint = {x:0,y:vertpos}
+
+DailySchedule.onSwipeLeft (event,layer) ->
+	flow.showPrevious()
+	vertpos = scroll_calendar.scrollY
+	scroll_home.scrollPoint = {x:0,y:vertpos}
 
 
 
-
-	
 
 
 
