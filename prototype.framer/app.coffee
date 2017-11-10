@@ -317,29 +317,14 @@ Home_Screen.onSwipeRight (event, layer) ->
 	vertpos = scroll_home.scrollY
 	scroll_calendar.scrollPoint = {x:0,y:vertpos}
 
+Calendar.onClick (event,layer) ->
+	flow.showOverlayLeft(DailySchedule)
+	vertpos = scroll_home.scrollY
+	scroll_calendar.scrollPoint = {x:0,y:vertpos}
+
 DailySchedule.onSwipeLeft (event,layer) ->
 	flow.showPrevious()
 	vertpos = scroll_calendar.scrollY
 	scroll_home.scrollPoint = {x:0,y:vertpos}
 
-
-
-
-
-
-
-		
-			
-		
-	
-	
-		
-		
-	
-		
-
-		
-		
-		
-		
 
