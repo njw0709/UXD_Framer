@@ -59,7 +59,6 @@ CurrentTime.states =
 	future:
 		opacity: 0.50
 
-
 # Make the pacman stick to the top when scrolled further
 Time_pacman.name = "StickyHeader"
 
@@ -110,6 +109,14 @@ Pillsypos=[]
 for index in [0..2]
 	Pillsxpos.push(Pillsavail[index].x)
 	Pillsypos.push(Pillsavail[index].y)
+
+Diff=[]
+
+Confimation_popup.states =
+	default:
+		opacity:0
+	popup:
+		opacity:1
 
 Pacman.on Events.DragStart, ->
 	scroll_home.scrollVertical=false
@@ -181,7 +188,33 @@ Pacman.on Events.DragEnd, ->
 			curve: Spring(damping: 0.5)
 			time:0.5
 
+	Confimation_popup.states.switchInstant "popup"
+
 	scroll_home.scrollVertical=true
+
+checkboxes=[Checkedbox_1,Checkedbox_2]
+counters=[0,0]
+for box in checkboxes
+	box.states =
+		default:
+			opacity:1
+		uncheck:
+			opacity:0
+	box.on Events.Click,->
+		ind = checkboxes.indexOf(this)
+		counters[ind]=counters[ind]+1
+		if counters[ind] %%2 == 0
+			this.states.switchInstant "default"
+		else
+			this.states.switchInstant "uncheck"
+
+
+No_Take.onClick (event, layer) ->
+	Confimation_popup.states.switchInstant "default"
+
+Confirm_Take.onClick (event, layer) ->
+	Confimation_popup.states.switchInstant "default"
+
 
 
 
