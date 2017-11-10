@@ -1,13 +1,26 @@
+
 {StickyHeaders} = require "sticky-headers/StickyHeaders"
 # make the page scrollable
+flow = new FlowComponent
+Home_Screen.parent=flow
+flow.showNext(Home_Screen)
+
+
 scroll = new ScrollComponent
 	size: Screen.size
 	scrollHorizontal: false
-
+scroll.parent = Home_Screen
 Calendar.parent=scroll.content
 Time_pacman.parent=scroll.content
+Pill_Info.parent=scroll.content
+# Button to transition to pill info list, fixed to position
+scroll.on Events.Move, (offset) ->
+	yOffset = -offset.y
+	Pill_Info.y=582+yOffset
+
 #scroll to current time 
 scroll.scrollToLayer(Time_pacman)
+scroll.mouseWheelEnabled=true
 
 #Define states for the time indicator
 CurrentTimeline.states = 
@@ -178,8 +191,67 @@ for index in [0..2]
 		if this in Pillsavail
 			availind = Pillsavail.indexOf(this)
 			Pillsypos[availind]=this.y
+
+
+
+# Move to Pill info
+Pill_Info.onClick (event, layer) ->
+	flow.showNext(Pill_Information)
 	
-		
+Return_home.onClick (event, layer) ->
+	flow.showPrevious()
+
+info_scroll = new ScrollComponent
+	width:375
+	height:667-76*2
+	x:0
+	y:76
+	scrollHorizontal: false
+
+info_scroll.parent=Pill_Information
+PillList.parent = info_scroll.content
+info_scroll.scrollToLayer(PillList)
+
+
+BtCalendar.onClick (event,layer) ->
+	flow.showNext(CalendarScreen)
+
+BtMypills.onClick (event,layer) ->
+	flow.showPrevious()
+
+#Add Pill Sequence
+Addpill.onClick (event,layer) ->
+	flow.showNext(AddPillScreen)
+
+Textfield=[Text1,Text2,Text3,Mealbut]
+
+for field in Textfield
+	field.on Events.Click, ->
+		flow.showNext(AddPillScreen_Comp)
+
+Cancelbut.on Events.Click, ->
+	flow.showPrevious()
+
+Cancelbut_comp.on Events.Click, ->
+	flow.showOverlayLeft(Pill_Information)
+
+Confirm_comp.on Events.Click, ->
+	flow.showOverlayLeft(PillInfo_New)
+
+
+#Updated Pill List Definition
+
+Return_home_new.onClick (event, layer) ->
+	flow.showOverlayLeft(Home_Screen)
+
+
+
+
+	
+
+
+
+
 		
 			
 		
