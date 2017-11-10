@@ -1,9 +1,14 @@
 {StickyHeaders} = require "sticky-headers/StickyHeaders"
+flow = new FlowComponent
+Home_Screen.parent = flow
+Screen_for_klicking_pill.parent = flow
+flow.showNext(Home_Screen)
+
 # make the page scrollable
 scroll = new ScrollComponent
 	size: Screen.size
 	scrollHorizontal: false
-
+scroll.parent = Home_Screen
 Calendar.parent=scroll.content
 Time_pacman.parent=scroll.content
 #scroll to current time 
@@ -175,7 +180,28 @@ for index in [0..2]
 		ind = Pillscheduled.indexOf(this)
 		this.draggable.enabled=false
 		Timewindow[ind].states.switchInstant "default"
+
+
+#Go to next screen by klicking pill
+
+Pills=[Pill1,Pill2,Pill3,Pill4,Pill5]
+for i in Pills
+	i.onClick (event, layer) ->
+			flow.showNext(Screen_for_klicking_pill)
+
+	return_to_home.onClick (event, layer) ->
+		flow.showPrevious()
+				
+			
 		
+		
+		
+		
+	
+		
+		
+
+
 		
 			
 		
