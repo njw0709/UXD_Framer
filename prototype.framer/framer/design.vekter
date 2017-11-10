@@ -599,7 +599,7 @@
                 "brightness" : 100,
                 "brightnessEnabled" : 0,
                 "centerAnchorX" : 0.98999999999999999,
-                "centerAnchorY" : 0.4263392857142857,
+                "centerAnchorY" : 0.39955357142857145,
                 "children" : [
 
                 ],
@@ -622,7 +622,7 @@
                 "fillType" : "color",
                 "grayscale" : 0,
                 "grayScaleEnabled" : 0,
-                "height" : 154,
+                "height" : 226,
                 "heightFactor" : null,
                 "hueRotate" : 0,
                 "hueRotateEnabled" : 0,
@@ -647,7 +647,7 @@
                 "sepia" : 0,
                 "sepiaEnabled" : 0,
                 "targetName" : "Timerail_2",
-                "top" : 496,
+                "top" : 424,
                 "visible" : true,
                 "width" : 49,
                 "widthFactor" : null
@@ -744,14 +744,14 @@
                 "borderStyle" : "solid",
                 "borderTop" : 3,
                 "borderWidth" : 3,
-                "bottom" : 356,
+                "bottom" : null,
                 "boxShadows" : [
 
                 ],
                 "brightness" : 100,
                 "brightnessEnabled" : 0,
-                "centerAnchorX" : 0.98999999999999999,
-                "centerAnchorY" : 0.63206845238095233,
+                "centerAnchorX" : 1.01,
+                "centerAnchorY" : 0.45424107142857145,
                 "children" : [
 
                 ],
@@ -774,7 +774,7 @@
                 "fillType" : "color",
                 "grayscale" : 0,
                 "grayScaleEnabled" : 0,
-                "height" : 277,
+                "height" : 383,
                 "heightFactor" : null,
                 "hueRotate" : 0,
                 "hueRotateEnabled" : 0,
@@ -792,14 +792,14 @@
                 "radiusPerCorner" : false,
                 "radiusTopLeft" : 22,
                 "radiusTopRight" : 22,
-                "right" : -24,
+                "right" : -25,
                 "rotation" : 0,
                 "saturate" : 100,
                 "saturateEnabled" : 0,
                 "sepia" : 0,
                 "sepiaEnabled" : 0,
                 "targetName" : "Timerail_4",
-                "top" : null,
+                "top" : 419,
                 "visible" : true,
                 "width" : 49,
                 "widthFactor" : null

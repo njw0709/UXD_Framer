@@ -84,7 +84,7 @@ Pacman.on Events.DragStart, ->
 	scroll.scrollVertical=false
 	for index in [0..1]
 		Pillsnotavail[index].states.switchInstant "cannottake"
-	for index in [0..1]
+	for index in [0..2]
 		Pillsavail[index].animate
 			x:90
 			y:Pillsypos[index]+index*60
@@ -175,6 +175,10 @@ for index in [0..2]
 		ind = Pillscheduled.indexOf(this)
 		this.draggable.enabled=false
 		Timewindow[ind].states.switchInstant "default"
+		if this in Pillsavail
+			availind = Pillsavail.indexOf(this)
+			Pillsypos[availind]=this.y
+	
 		
 		
 			
