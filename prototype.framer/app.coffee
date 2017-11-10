@@ -104,13 +104,13 @@ for index in [0..1]
 			default:
 				opacity: 1
 
+# Default positions
 Pillsxpos=[]
 Pillsypos=[]
 for index in [0..2]
 	Pillsxpos.push(Pillsavail[index].x)
 	Pillsypos.push(Pillsavail[index].y)
 
-Diff=[]
 Pacman.on Events.DragStart, ->
 	scroll_home.scrollVertical=false
 
@@ -128,9 +128,6 @@ Pacman.on Events.DragStart, ->
 		options:
 			time: 0.5
 
-	for index in [0..2]
-		Diff.push(Pillsavail[index].y-Pacman.maxY)
-
 pacmanXTrail = []
 pacmanYTrail = []
 touchedPillsIdcs = []
@@ -142,8 +139,8 @@ Pacman.on Events.DragMove, ->
 	# print pacmanXTrail.length
 	for index in [0..Pillsavail.length-1]
 		Pillsavail[index].on "change:point", ->
-		# print "In touchedPills: #{index in touchedPillsIdcs}; isTouching: #{isTouching(Pacman,Pillsavail[index],Diff[index])}"
-		if (not (index in touchedPillsIdcs)) and isTouching(Pacman,Pillsavail[index],Diff[index])
+		# print "In touchedPills: #{index in touchedPillsIdcs}; isTouching: #{isTouching(Pacman,Pillsavail[index])}"
+		if (not (index in touchedPillsIdcs)) and isTouching(Pacman,Pillsavail[index])
 			touch_counter += 1
 			print "Touched pill#{index} \##{touch_counter}"
 			touchedPillsIdcs.push(index)
@@ -189,7 +186,7 @@ Pacman.on Events.DragEnd, ->
 
 
 #Collision Detection
-isTouching = (Pacman, Pill, diff) ->
+isTouching = (Pacman, Pill) ->
 	Pill_r = (Pill.maxX - Pill.x) / 2
 	Pill_x = (Pill.screenFrame.x + Pill_r) # Center position
 	Pill_y = (Pill.screenFrame.y + Pill_r)
