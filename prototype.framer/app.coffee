@@ -224,11 +224,13 @@ Pill_Info.onClick (event, layer) ->
 Pills=[Pill1,Pill2,Pill3,Pill4,Pill5]
 for i in Pills
 	i.onClick (event, layer) ->
-			flow.showNext(Screen_for_klicking_pill)
+		flow.showNext(Screen_for_klicking_pill)
 
-	return_to_home.onClick (event, layer) ->
-		flow.showPrevious()
-	
+
+return_to_home.onClick (event, layer) ->
+	flow.showPrevious()
+
+
 Return_home.onClick (event, layer) ->
 	flow.showOverlayTop(Home_Screen_layer)
 
@@ -242,6 +244,12 @@ info_scroll = new ScrollComponent
 info_scroll.parent=Pill_Information
 PillList.parent = info_scroll.content
 info_scroll.scrollToLayer(PillList)
+
+Pill_info_list = [Pilllist1,Pilllist2,Pilllist3]
+for listel in Pill_info_list
+	listel.on Events.Click, ->
+		flow.showNext(Screen_for_klicking_pill)
+		
 
 
 BtCalendar.onClick (event,layer) ->
