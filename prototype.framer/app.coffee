@@ -129,15 +129,7 @@ Pacman.on Events.DragEnd, ->
 			
 	scroll.scrollVertical=true
 
-# Change times for the pills
-Pillscheduled=[Pill2,Pill3,Pill4,Pill5]
-Timewindow = [300,400,200,100]
-Timerail.states=
-	default:
-		opacity:0
-	appear:
-		opacity:1
-		
+
 #Collision Detection
 isTouching = (Pacman, Pill, diff) ->
 	Pill_r=(Pill.maxX-Pill.x)/2 
@@ -151,6 +143,33 @@ isTouching = (Pacman, Pill, diff) ->
 		return true
 	else 
 		return false
+		
+#Time window
+
+Pillscheduled=[Pill2,Pill4,Pill5]
+Timewindow = [Timerail_2,Timerail_4,Timerail_5]
+for index in [0..2]	
+	Timewindow[index].states=
+		default:
+			opacity:0
+		appear:
+			opacity:1
+
+	Pillscheduled[index].onLongPressStart (event, layer) ->
+		scroll.scrollVertical=false
+		ind = Pillscheduled.indexOf(this)
+		Timewindow[ind].states.switchInstant "appear"
+
+	Pillscheduled[index].onLongPressEnd (event, layer) ->
+		ind = Pillscheduled.indexOf(this)
+		Timewindow[ind].states.switchInstant "default"
+		
+		
+			
+		
+	
+	
+		
 		
 	
 		
