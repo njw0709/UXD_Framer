@@ -1,4 +1,3 @@
-
 {StickyHeaders} = require "sticky-headers/StickyHeaders"
 flow = new FlowComponent
 Home_Screen.parent = flow
@@ -95,19 +94,23 @@ Pacman.draggable.overdrag=false
 Pacman.draggable.bounce = false
 Pacman.draggable.momentum=false
 
+# Default Pacman position
+Pacman.xHome = 244
+Pacman.yHome = 21
+
 Pillsavail = [Pill2, Pill3, Pill4]
 Pillsnotavail = [Pill1, Pill5]
 
 for pill in Pillsavail
-	pill.states=
+	pill.states =
 			default:
 				opacity: 1
 			taken:
-				opacity: 0
+				opacity: 1
 
 
 for pill in Pillsnotavail
-	pill.states=
+	pill.states =
 			default:
 				opacity: 1
 			cannottake:
@@ -115,13 +118,11 @@ for pill in Pillsnotavail
 
 
 # Default positions
-Pillsxpos=[]
-Pillsypos=[]
+Pillsxpos = []
+Pillsypos = []
 for pill in Pillsavail
 	Pillsxpos.push(pill.x)
 	Pillsypos.push(pill.y)
-
-Diff=[]
 
 Confimation_popup.states =
 	default:
@@ -130,20 +131,20 @@ Confimation_popup.states =
 		opacity:1
 
 Pacman.on Events.DragStart, ->
-	scroll_home.scrollVertical=false
+	scroll_home.scrollVertical = false
 
 	for pill in Pillsnotavail
 		pill.states.switchInstant "cannottake"
 
 	for index in [0..Pillsavail.length-1]
 		Pillsavail[index].animate
-			x:90
+			x:130
 			y:Pillsypos[index] + index * 60
 			options:
 				time: 0.5
 
 	Pillsavail[2].animate
-		x:90
+		x:130
 		y:Pillsypos[2]
 		options:
 			time: 0.5
@@ -153,7 +154,6 @@ pacmanYTrail = []
 touchedPillsIdcs = []
 untouchedPillsIdcs = []
 
-touch_counter = 0
 Pacman.on Events.DragMove, ->
 	pacmanXTrail.push(this.screenFrame.x)
 	pacmanYTrail.push(this.screenFrame.y)
@@ -162,7 +162,6 @@ Pacman.on Events.DragMove, ->
 		index = Pillsavail.indexOf(pill)
 		pill.on "change:point", ->
 		if (not (index in touchedPillsIdcs)) and isTouching(Pacman,pill) and pill.states.current.name != "taken"
-			touch_counter += 1
 			touchedPillsIdcs.push(index)
 
 	caterpillarPosition = 0
@@ -173,7 +172,7 @@ Pacman.on Events.DragMove, ->
 		pill.animate
 			x: pacmanXTrail[(pacmanXTrail.length - 1) - 5 * caterpillarPosition] + 10
 			y: pacmanYTrail[(pacmanYTrail.length - 1) - 5 * caterpillarPosition] + yOffset
-			opacity: 0.75
+			# opacity: 0.75
 			options:
 				time: 0.1
 
@@ -181,6 +180,7 @@ Pacman.on Events.DragMove, ->
 
 
 Pacman.on Events.DragEnd, ->
+
 	for index in [0..Pillsnotavail.length-1]
 		Pillsnotavail[index].states.switchInstant "default"
 
@@ -195,9 +195,24 @@ Pacman.on Events.DragEnd, ->
 					curve: Spring(damping: 0.5)
 					time: 0.5
 
+	print "Pacman z: " + this.z
+	# TODO: Fix z arragement of pills
+	touchedPillPos = 0 # Position in touchedPillIdcs
+	for pillIdx in touchedPillsIdcs # TODO: Rethink what we want to do with taken pills
+		pill = Pillsavail[pillIdx]
+		#										v Position at start
+		yOffset = this.y - this.screenFrame.y + 386 + 7 #< adjustment
+		pill.animate
+			x: this.xHome + 68 + 20 * touchedPillPos
+			y: this.yHome + yOffset
+
+		print "Pill z: " + pill.z
+
+		++touchedPillPos
+
 	this.animate
-		x:311
-		y:21
+		x: this.xHome
+		y: this.yHome
 		options:
 			curve: Spring(damping: 0.5)
 			time:0.5
@@ -238,10 +253,10 @@ No_Take.onClick (event, layer) ->
 	Confimation_popup.states.switchInstant "default"
 
 Confirm_Take.onClick (event, layer) ->
-	for index in touchedPillsIdcs # TODO: Rethink what we want to do with taken pills
-		Pillsavail[index].states.switchInstant "taken"
+	for pillIdx in touchedPillsIdcs # TODO: Rethink what we want to do with taken pills
+		Pillsavail[pillIdx].states.switchInstant "taken"
 
-	moveUntouchedPills()
+	# moveUntouchedPills()
 	touchedPillsIdcs = []
 	untouchedPillsIdcs = []
 	Confimation_popup.states.switchInstant "default"
