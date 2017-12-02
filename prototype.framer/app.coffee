@@ -196,7 +196,9 @@ Pacman.on Events.DragEnd, ->
 					curve: Spring(damping: 0.5)
 					time: 0.5
 
+
 	# print "Pacman z: " + this.z
+
 	# TODO: Fix z arragement of pills
 	touchedPillPos = 0 # Position in touchedPillIdcs
 	for pillIdx in touchedPillsIdcs # TODO: Rethink what we want to do with taken pills
