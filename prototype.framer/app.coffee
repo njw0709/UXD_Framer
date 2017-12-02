@@ -135,17 +135,20 @@ Pacman.on Events.DragStart, ->
 		pill.states.switchInstant "cannottake"
 
 	for index in [0..Pillsavail.length-1]
-		Pillsavail[index].animate
+		pill = Pillsavail[index]
+		if pill.states.current.name != "taken"
+			pill.animate
+				x:130
+				y:Pillsypos[index] + index * 60
+				options:
+					time: 0.5
+
+	if pill.states.current.name != "taken"
+		Pillsavail[2].animate
 			x:130
-			y:Pillsypos[index] + index * 60
+			y:Pillsypos[2]
 			options:
 				time: 0.5
-
-	Pillsavail[2].animate
-		x:130
-		y:Pillsypos[2]
-		options:
-			time: 0.5
 
 pacmanXTrail = []
 pacmanYTrail = []
@@ -177,11 +180,7 @@ Pacman.on Events.DragMove, ->
 		caterpillarPosition++
 
 
-# scroll_home.onScroll ->
-#     print scroll_home.scrollY
-
 Pacman.on Events.DragEnd, ->
-
 	for index in [0..Pillsnotavail.length-1]
 		Pillsnotavail[index].states.switchInstant "default"
 
@@ -197,18 +196,15 @@ Pacman.on Events.DragEnd, ->
 					time: 0.5
 
 
-	# print "Pacman z: " + this.z
 
-	# TODO: Fix z arragement of pills
 	touchedPillPos = 0 # Position in touchedPillIdcs
 	for pillIdx in touchedPillsIdcs # TODO: Rethink what we want to do with taken pills
 		pill = Pillsavail[pillIdx]
 		pill.animate
+			z: touchedPillsIdcs.length - touchedPillPos
 			x: this.xHome + 68 + 20 * touchedPillPos
 			y: 386 + this.yHome + 7
-			z: touchedPillPos
 			#   ^ absolute CurrentTimeline. I promise I tried to make this not suck.
-		# print "Pill z: " + pill.z
 
 		++touchedPillPos
 
@@ -221,11 +217,13 @@ Pacman.on Events.DragEnd, ->
 
 	if touchedPillsIdcs.length > 0
 		Confimation_popup.states.switchInstant "popup"
+		Pacman.draggable.enabled = false
+		scroll_home.scrollVertical = false
 
 	pacmanXTrail = []
 	pacmanYTrail = []
 
-	scroll_home.scrollVertical=true
+
 
 checkboxes=[Checkedbox_1,Checkedbox_2]
 counters=[0,0]
@@ -251,7 +249,9 @@ No_Take.onClick (event, layer) ->
 	untouchedPillsIdcs = touchedPillsIdcs
 	moveUntouchedPills()
 	touchedPillsIdcs = []
-	untouchedPillsIdcs = []
+
+	scroll_home.scrollVertical = true
+	Pacman.draggable.enabled = true
 	Confimation_popup.states.switchInstant "default"
 
 Confirm_Take.onClick (event, layer) ->
@@ -261,12 +261,15 @@ Confirm_Take.onClick (event, layer) ->
 	# moveUntouchedPills()
 	touchedPillsIdcs = []
 	untouchedPillsIdcs = []
+	scroll_home.scrollVertical = true
+	Pacman.draggable.enabled = true
 	Confimation_popup.states.switchInstant "default"
 
 moveUntouchedPills = () ->
 	if untouchedPillsIdcs.length != 0
 		for index in untouchedPillsIdcs
 			Pillsavail[index].animate
+				z:0
 				x:Pillsxpos[index]
 				y:Pillsypos[index]
 				opacity: 1
