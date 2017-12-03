@@ -369,6 +369,8 @@ return_to_home_2.onClick (event, layer) ->
 return_to_home_3.onClick (event, layer) ->
 	flow.showPrevious()
 
+return_to_home_4.onClick (event, layer) ->
+	flow.showPrevious()
 
 Return_home.onClick (event, layer) ->
 	flow.showOverlayTop(Home_Screen_layer)
@@ -384,12 +386,19 @@ info_scroll.parent=Pill_Information
 PillList.parent = info_scroll.content
 info_scroll.scrollToLayer(PillList)
 
-Pill_info_list = [Pilllist1,Pilllist2,Pilllist3]
-for listel in Pill_info_list
-	listel.on Events.Click, ->
-		flow.showNext(Screen_for_klicking_pill_red)
 
 
+Pilllist1.on Events.Click, ->
+	flow.showNext(Screen_for_klicking_pill_red)
+
+Pilllist2.on Events.Click, ->
+	flow.showNext(Screen_for_klicking_pill_green)
+		
+Pilllist3.on Events.Click, ->
+	flow.showNext(Screen_for_klicking_pill_orange)
+
+Pilllist4.on Events.Click, ->
+	flow.showNext(Screen_for_klicking_pill_red_1)
 
 BtCalendar.onClick (event,layer) ->
 	flow.showNext(CalendarScreen)
