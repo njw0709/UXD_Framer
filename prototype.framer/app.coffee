@@ -67,6 +67,8 @@ StickyHeaders.enableFor(scroll_home)
 #make time indicator change colors when scrolled up far
 Current_Time=Time_pacman.y
 
+Confimation_popup.screenOffset = Confimation_popup.y - Time_pacman.y # Starting position
+
 scroll_home.onMove ->
 	if Time_pacman.y > Current_Time
 		CurrentTimeline.states.switchInstant "future"
@@ -82,6 +84,9 @@ scroll_home.onMove ->
 			opacity: 0
 			options:
 				time: 0
+
+	print "scroll_home.y: " + this.y
+	Confimation_popup.y = Confimation_popup.screenOffset - this.y
 
 
 # Make pacman draggable
@@ -217,7 +222,7 @@ Pacman.on Events.DragEnd, ->
 
 	if touchedPillsIdcs.length > 0
 		Confimation_popup.states.switchInstant "popup"
-		Pacman.draggable.enabled = false
+		# Pacman.draggable.enabled = false #UNDO UNDO UNDO UNDO UNDO UNDO
 		scroll_home.scrollVertical = false
 
 	pacmanXTrail = []
@@ -343,12 +348,12 @@ Pills_red=[Pill1,Pill4]
 for i in Pills_red
 	i.onClick (event, layer) ->
 		flow.showNext(Screen_for_klicking_pill_red)
-		
+
 Pills_green=[Pill2]
 for i in Pills_green
 	i.onClick (event, layer) ->
 		flow.showNext(Screen_for_klicking_pill_green)
-		
+
 Pills_orange=[Pill3,Pill5]
 for i in Pills_orange
 	i.onClick (event, layer) ->
@@ -357,10 +362,10 @@ for i in Pills_orange
 
 return_to_home_1.onClick (event, layer) ->
 	flow.showPrevious()
-	
+
 return_to_home_2.onClick (event, layer) ->
 	flow.showPrevious()
-	
+
 return_to_home_3.onClick (event, layer) ->
 	flow.showPrevious()
 
