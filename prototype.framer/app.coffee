@@ -1,7 +1,7 @@
 {StickyHeaders} = require "sticky-headers/StickyHeaders"
 flow = new FlowComponent
 Home_Screen.parent = flow
-Screen_for_klicking_pill.parent = flow
+Screen_for_klicking_pill_red.parent = flow
 flow.showNext(Home_Screen)
 
 # make the page scrollable
@@ -334,13 +334,29 @@ Pill_Info.onClick (event, layer) ->
 
 #Go to next screen by klicking pill
 
-Pills=[Pill1,Pill2,Pill3,Pill4,Pill5]
-for i in Pills
+Pills_red=[Pill1,Pill4]
+for i in Pills_red
 	i.onClick (event, layer) ->
-		flow.showNext(Screen_for_klicking_pill)
+		flow.showNext(Screen_for_klicking_pill_red)
+		
+Pills_green=[Pill2]
+for i in Pills_green
+	i.onClick (event, layer) ->
+		flow.showNext(Screen_for_klicking_pill_green)
+		
+Pills_orange=[Pill3,Pill5]
+for i in Pills_orange
+	i.onClick (event, layer) ->
+		flow.showNext(Screen_for_klicking_pill_orange)
 
 
-return_to_home.onClick (event, layer) ->
+return_to_home_1.onClick (event, layer) ->
+	flow.showPrevious()
+	
+return_to_home_2.onClick (event, layer) ->
+	flow.showPrevious()
+	
+return_to_home_3.onClick (event, layer) ->
 	flow.showPrevious()
 
 
@@ -361,7 +377,7 @@ info_scroll.scrollToLayer(PillList)
 Pill_info_list = [Pilllist1,Pilllist2,Pilllist3]
 for listel in Pill_info_list
 	listel.on Events.Click, ->
-		flow.showNext(Screen_for_klicking_pill)
+		flow.showNext(Screen_for_klicking_pill_red)
 
 
 
