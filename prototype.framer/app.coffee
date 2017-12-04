@@ -29,8 +29,6 @@ Home_Screen.parent=scroll_home.content
 Time_pacman.parent=scroll_home.content
 Pill_Info.parent=scroll_home.content
 
-screenOffset = 0
-
 # Button to transition to pill info list, fixed to position
 scroll_home.on Events.Move, (offset) ->
 	yOffset = -offset.y
@@ -68,6 +66,8 @@ StickyHeaders.enableFor(scroll_home)
 #make time indicator change colors when scrolled up far
 Current_Time=Time_pacman.y
 
+Confimation_popup.screenOffset = Confimation_popup.y - Time_pacman.y # Starting position
+
 scroll_home.onMove ->
 	if Time_pacman.y > Current_Time
 		CurrentTimeline.states.switchInstant "future"
@@ -83,6 +83,9 @@ scroll_home.onMove ->
 			opacity: 0
 			options:
 				time: 0
+
+	print "scroll_home.y: " + this.y
+	Confimation_popup.y = Confimation_popup.screenOffset - this.y
 
 
 # Make pacman draggable
@@ -136,17 +139,20 @@ Pacman.on Events.DragStart, ->
 		pill.states.switchInstant "cannottake"
 
 	for index in [0..Pillsavail.length-1]
-		Pillsavail[index].animate
+		pill = Pillsavail[index]
+		if pill.states.current.name != "taken"
+			pill.animate
+				x:130
+				y:Pillsypos[index] + index * 60
+				options:
+					time: 0.5
+
+	if pill.states.current.name != "taken"
+		Pillsavail[2].animate
 			x:130
-			y:Pillsypos[index] + index * 60
+			y:Pillsypos[2]
 			options:
 				time: 0.5
-
-	Pillsavail[2].animate
-		x:130
-		y:Pillsypos[2]
-		options:
-			time: 0.5
 
 pacmanXTrail = []
 pacmanYTrail = []
@@ -179,7 +185,6 @@ Pacman.on Events.DragMove, ->
 
 
 Pacman.on Events.DragEnd, ->
-
 	for index in [0..Pillsnotavail.length-1]
 		Pillsnotavail[index].states.switchInstant "default"
 
@@ -194,18 +199,16 @@ Pacman.on Events.DragEnd, ->
 					curve: Spring(damping: 0.5)
 					time: 0.5
 
-	print "Pacman z: " + this.z
-	# TODO: Fix z arragement of pills
+
+
 	touchedPillPos = 0 # Position in touchedPillIdcs
 	for pillIdx in touchedPillsIdcs # TODO: Rethink what we want to do with taken pills
 		pill = Pillsavail[pillIdx]
-		#										v Position at start
-		yOffset = this.y - this.screenFrame.y + 386 + 7 #< adjustment
 		pill.animate
+			z: touchedPillsIdcs.length - touchedPillPos
 			x: this.xHome + 68 + 20 * touchedPillPos
-			y: this.yHome + yOffset
-
-		print "Pill z: " + pill.z
+			y: 386 + this.yHome + 7
+			#   ^ absolute CurrentTimeline. I promise I tried to make this not suck.
 
 		++touchedPillPos
 
@@ -218,11 +221,13 @@ Pacman.on Events.DragEnd, ->
 
 	if touchedPillsIdcs.length > 0
 		Confimation_popup.states.switchInstant "popup"
+		# Pacman.draggable.enabled = false #UNDO UNDO UNDO UNDO UNDO UNDO
+		scroll_home.scrollVertical = false
 
 	pacmanXTrail = []
 	pacmanYTrail = []
 
-	scroll_home.scrollVertical=true
+
 
 checkboxes=[Checkedbox_1,Checkedbox_2]
 counters=[0,0]
@@ -248,7 +253,9 @@ No_Take.onClick (event, layer) ->
 	untouchedPillsIdcs = touchedPillsIdcs
 	moveUntouchedPills()
 	touchedPillsIdcs = []
-	untouchedPillsIdcs = []
+
+	scroll_home.scrollVertical = true
+	Pacman.draggable.enabled = true
 	Confimation_popup.states.switchInstant "default"
 
 Confirm_Take.onClick (event, layer) ->
@@ -258,12 +265,15 @@ Confirm_Take.onClick (event, layer) ->
 	# moveUntouchedPills()
 	touchedPillsIdcs = []
 	untouchedPillsIdcs = []
+	scroll_home.scrollVertical = true
+	Pacman.draggable.enabled = true
 	Confimation_popup.states.switchInstant "default"
 
 moveUntouchedPills = () ->
 	if untouchedPillsIdcs.length != 0
 		for index in untouchedPillsIdcs
 			Pillsavail[index].animate
+				z:0
 				x:Pillsxpos[index]
 				y:Pillsypos[index]
 				opacity: 1
@@ -337,12 +347,12 @@ Pills_red=[Pill1,Pill4]
 for i in Pills_red
 	i.onClick (event, layer) ->
 		flow.showNext(Screen_for_klicking_pill_red)
-		
+
 Pills_green=[Pill2]
 for i in Pills_green
 	i.onClick (event, layer) ->
 		flow.showNext(Screen_for_klicking_pill_green)
-		
+
 Pills_orange=[Pill3,Pill5]
 for i in Pills_orange
 	i.onClick (event, layer) ->
@@ -351,13 +361,15 @@ for i in Pills_orange
 
 return_to_home_1.onClick (event, layer) ->
 	flow.showPrevious()
-	
+
 return_to_home_2.onClick (event, layer) ->
 	flow.showPrevious()
-	
+
 return_to_home_3.onClick (event, layer) ->
 	flow.showPrevious()
 
+return_to_home_4.onClick (event, layer) ->
+	flow.showPrevious()
 
 Return_home.onClick (event, layer) ->
 	flow.showOverlayTop(Home_Screen_layer)
@@ -373,12 +385,19 @@ info_scroll.parent=Pill_Information
 PillList.parent = info_scroll.content
 info_scroll.scrollToLayer(PillList)
 
-Pill_info_list = [Pilllist1,Pilllist2,Pilllist3]
-for listel in Pill_info_list
-	listel.on Events.Click, ->
-		flow.showNext(Screen_for_klicking_pill_red)
 
 
+Pilllist1.on Events.Click, ->
+	flow.showNext(Screen_for_klicking_pill_red)
+
+Pilllist2.on Events.Click, ->
+	flow.showNext(Screen_for_klicking_pill_green)
+		
+Pilllist3.on Events.Click, ->
+	flow.showNext(Screen_for_klicking_pill_orange)
+
+Pilllist4.on Events.Click, ->
+	flow.showNext(Screen_for_klicking_pill_red_1)
 
 BtCalendar.onClick (event,layer) ->
 	flow.showNext(CalendarScreen)
