@@ -1,8 +1,7 @@
 {StickyHeaders} = require "sticky-headers/StickyHeaders"
 flow = new FlowComponent
-Home_Screen.parent = flow
 Screen_for_klicking_pill_red.parent = flow
-flow.showNext(Home_Screen)
+
 
 # make the page scrollable
 
@@ -395,14 +394,191 @@ Pill_Information.onSwipeRight (event, layer) ->
 Addpill.onClick (event,layer) ->
 	flow.showNext(AddPillScreen)
 
-Textfield=[Text1,Text2,Text3,Mealbut]
-
-for field in Textfield
-	field.on Events.Click, ->
-		flow.showNext(AddPillScreen_Comp)
-
 Cancelbut.on Events.Click, ->
+	flow.showOverlayLeft(Pill_Information)
+	
+Camerabut.on Events.Click, ->
+	flow.showNext(Add_Pill_photos)
+
+#Add photo screen
+Cancelbut_1.on Events.Click, ->
 	flow.showPrevious()
+
+AddPhoto.on Events.Click, ->
+	flow.showOverlayBottom(Add_Pill_Camera)
+
+#Photo view
+Takephoto.on Events.Click, ->
+	flow.showOverlayTop(Add_Pill_photos2)
+	
+#Add Photo 2 screen
+Add.on Events.Click, ->
+	flow.showNext(Add_Pill_Confirm)
+	
+Cancelbut_2.on Events.Click, ->
+	flow.showOverlayLeft(AddPillScreen)
+
+
+#schedule_time screen scrollable
+
+scroll_schedule = new ScrollComponent
+	x:0
+	y:76
+	width:375
+	height:667-64-76
+	scrollHorizontal: false
+	parent: Schedule_time
+	mouseWheelEnabled: true
+
+Scroll_content_sch.parent=scroll_schedule.content
+
+
+#Add Pill Confirm screen
+Confirm_1.on Events.Click, ->
+	flow.showNext(Schedule_time)
+Cancelbut_3.on Events.Click, ->
+	flow.showOverlayLeft(Pill_Information)
+	
+#Schedule_time screen buttons
+Cancelbut_4.on Events.Click, ->
+	flow.showOverlayLeft(Add_Pill_Confirm)
+
+Confirm_2.on Events.Click, ->
+	flow.showOverlayLeft(PillInfo_New)
+
+Handle_len_up.draggable.enabled=true
+Handle_len_up.draggable.horizontal=false
+Handle_len_up.draggable.momentum=false
+Handle_len_up.draggable.overdrag=false
+startlen_1=0
+startpos_1_up=0
+startpos_1_down=0
+#up
+Handle_len_up.on Events.DragStart, ->
+	scroll_schedule.scrollVertical=false
+	startpos_1_up= Handle_len_up.y
+	startlen_1 = TimeWindow1.size.height
+
+Handle_len_up.on Events.DragMove, ->
+	TimeWindow1.y=Handle_len_up.y+33
+	TimeWindow1.height=startlen_1-Handle_len_up.y+startpos_1_up
+	Handle_vert_pos_1.y=TimeWindow1.y+TimeWindow1.size.height/2-65/2
+
+	
+Handle_len_up.on Events.DragEnd, ->
+	scroll_schedule.scrollVertical=true
+
+#down
+Handle_len_down.draggable.enabled=true
+Handle_len_down.draggable.horizontal=false
+Handle_len_down.draggable.momentum=false
+Handle_len_down.draggable.overdrag=false
+
+Handle_len_down.on Events.DragStart, ->
+	scroll_schedule.scrollVertical=false
+	startpos_1_down= Handle_len_down.y
+	startlen_1 = TimeWindow1.size.height
+
+Handle_len_down.on Events.DragMove, ->
+	TimeWindow1.height=startlen_1+Handle_len_down.y-startpos_1_down
+	Handle_vert_pos_1.y=TimeWindow1.y+TimeWindow1.size.height/2-65/2
+	
+Handle_len_down.on Events.DragEnd, ->
+	scroll_schedule.scrollVertical=true
+	
+#Vertical
+
+Handle_vert_pos_1.draggable.enabled=true
+Handle_vert_pos_1.draggable.horizontal=false
+Handle_vert_pos_1.draggable.momentum=false
+Handle_vert_pos_1.draggable.overdrag=false
+
+startpos_vert=0
+
+Handle_vert_pos_1.on Events.DragStart, ->
+	scroll_schedule.scrollVertical=false
+	startlen_1=TimeWindow1.size.height
+	startpos_vert=Handle_vert_pos_1.y
+
+Handle_vert_pos_1.on Events.DragMove, ->
+	TimeWindow1.y=Handle_vert_pos_1.y-startlen_1/2+17
+	Handle_len_up.y=TimeWindow1.y-33
+	Handle_len_down.y=TimeWindow1.y+TimeWindow1.size.height
+	
+Handle_vert_pos_1.on Events.DragEnd, ->
+	scroll_schedule.scrollVertical=true
+
+
+#Timewindow2
+Handle_len_up_2.draggable.enabled=true
+Handle_len_up_2.draggable.horizontal=false
+Handle_len_up_2.draggable.momentum=false
+Handle_len_up_2.draggable.overdrag=false
+startlen_2=0
+startpos_2_up=0
+startpos_2_down=0
+#up
+Handle_len_up_2.on Events.DragStart, ->
+	scroll_schedule.scrollVertical=false
+	startpos_2_up= Handle_len_up_2.y
+	startlen_2 = TimeWindow2.size.height
+
+Handle_len_up_2.on Events.DragMove, ->
+	TimeWindow2.y=Handle_len_up_2.y+33
+	TimeWindow2.height=startlen_2-Handle_len_up_2.y+startpos_2_up
+	Handle_vert_pos_2.y=TimeWindow2.y+TimeWindow2.size.height/2-65/2
+
+	
+Handle_len_up_2.on Events.DragEnd, ->
+	scroll_schedule.scrollVertical=true
+
+#down
+Handle_len_down_2.draggable.enabled=true
+Handle_len_down_2.draggable.horizontal=false
+Handle_len_down_2.draggable.momentum=false
+Handle_len_down_2.draggable.overdrag=false
+
+Handle_len_down_2.on Events.DragStart, ->
+	scroll_schedule.scrollVertical=false
+	startpos_2_down= Handle_len_down_2.y
+	startlen_2 = TimeWindow2.size.height
+
+Handle_len_down_2.on Events.DragMove, ->
+	TimeWindow2.height=startlen_2+Handle_len_down_2.y-startpos_2_down
+	Handle_vert_pos_2.y=TimeWindow2.y+TimeWindow2.size.height/2-65/2
+	
+Handle_len_down_2.on Events.DragEnd, ->
+	scroll_schedule.scrollVertical=true
+	
+#Vertical
+
+Handle_vert_pos_2.draggable.enabled=true
+Handle_vert_pos_2.draggable.horizontal=false
+Handle_vert_pos_2.draggable.momentum=false
+Handle_vert_pos_2.draggable.overdrag=false
+
+startpos_vert_2=0
+
+Handle_vert_pos_2.on Events.DragStart, ->
+	scroll_schedule.scrollVertical=false
+	startlen_2=TimeWindow2.size.height
+	startpos_vert_2=Handle_vert_pos_2.y
+
+Handle_vert_pos_2.on Events.DragMove, ->
+	TimeWindow2.y=Handle_vert_pos_2.y-startlen_2/2+17
+	Handle_len_up_2.y=TimeWindow2.y-33
+	Handle_len_down_2.y=TimeWindow2.y+TimeWindow2.size.height
+	
+Handle_vert_pos_2.on Events.DragEnd, ->
+	scroll_schedule.scrollVertical=true
+	
+
+# Button to transition to pill info list, fixed to position
+scroll_home.on Events.Move, (offset) ->
+	yOffset = -offset.y
+	Pill_Info.y=582+yOffset
+	
+
 
 Cancelbut_comp.on Events.Click, ->
 	flow.showOverlayLeft(Pill_Information)
