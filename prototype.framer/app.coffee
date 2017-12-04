@@ -1,8 +1,7 @@
 {StickyHeaders} = require "sticky-headers/StickyHeaders"
 flow = new FlowComponent
-Home_Screen.parent = flow
 Screen_for_klicking_pill_red.parent = flow
-flow.showNext(Home_Screen)
+
 
 # make the page scrollable
 
@@ -592,6 +591,14 @@ Handle_vert_pos_2.on Events.DragMove, ->
 	
 Handle_vert_pos_2.on Events.DragEnd, ->
 	scroll_schedule.scrollVertical=true
+
+	
+
+# Button to transition to pill info list, fixed to position
+scroll_home.on Events.Move, (offset) ->
+	yOffset = -offset.y
+	Pill_Info.y=582+yOffset
+	
 
 Cancelbut_comp.on Events.Click, ->
 	flow.showOverlayLeft(Pill_Information)
