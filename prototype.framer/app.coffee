@@ -1,3 +1,6 @@
+#for ab testing
+con_wind=true
+
 {StickyHeaders} = require "sticky-headers/StickyHeaders"
 flow = new FlowComponent
 Screen_for_klicking_pill_red.parent = flow
@@ -178,6 +181,47 @@ Pacman.on Events.DragMove, ->
 		caterpillarPosition++
 
 
+Confirmation_content = [one_list,two_list,three_list]
+
+one_list_cb = [Check1_one]
+two_list_cb = [Check1_two,Check2_two]
+three_list_cb = [Check1_three,Check2_three,Check3_three]
+checkedboxes=[one_list_cb,two_list_cb,three_list_cb]
+
+
+counter = [0,0,0]
+
+for lists in checkedboxes
+	for item in lists
+		item.states = 
+			default:
+				opacity:1
+			uncheck:
+				opacity:0
+		idx = lists.indexOf(item)
+		item.on Events.Click, ->
+			counter[idx]=counter[idx]+1
+			print(counter[idx])
+			if counter[idx] %%2 ==0
+				this.states.switchInstant "default"
+			else
+				untouchedPillsIdcs.push(touchedPillsIdcs.pop())
+				this.states.switchInstant "uncheck"
+			
+
+for item in Confirmation_content
+	item.states = 
+		default:
+			x:168
+			y:0
+			opacity:0
+			parent:Home_Screen
+		appear:
+			x:30
+			y:76
+			opacity: 1
+			parent:Confimation_popup
+
 Pacman.on Events.DragEnd, ->
 
 	for index in [0..Pillsnotavail.length-1]
@@ -216,32 +260,17 @@ Pacman.on Events.DragEnd, ->
 			curve: Spring(damping: 0.5)
 			time:0.5
 
-	if touchedPillsIdcs.length > 0
+	if touchedPillsIdcs.length > 0 && con_wind
 		Confimation_popup.states.switchInstant "popup"
+		Confirmation_content[touchedPillsIdcs.length-1].states.switchInstant "appear"
 
 	pacmanXTrail = []
 	pacmanYTrail = []
 
 	scroll_home.scrollVertical=true
 
-checkboxes=[Checkedbox_1,Checkedbox_2]
-counters=[0,0]
-for box in checkboxes
-	box.states =
-		default:
-			opacity:1
-		uncheck:
-			opacity:0
 
-	idx = checkboxes.indexOf(this)
-	box.on Events.Click,->
-		counters[idx]=counters[idx]+1
-		if counters[idx] %%2 == 0
-			this.states.switchInstant "default"
-		else
-			untouchedPillsIdcs.push(touchedPillsIdcs.pop())
-			 # TODO: Map to actual pill
-			this.states.switchInstant "uncheck"
+
 
 # TODO: Lock all actions outside of buttons when confirmation screen is up
 No_Take.onClick (event, layer) ->
@@ -250,16 +279,20 @@ No_Take.onClick (event, layer) ->
 	touchedPillsIdcs = []
 	untouchedPillsIdcs = []
 	Confimation_popup.states.switchInstant "default"
+	for i in [0..2]
+		Confirmation_content[i].states.switchInstant "default"
+	counter=[0,0,0]
 
 Confirm_Take.onClick (event, layer) ->
 	for pillIdx in touchedPillsIdcs # TODO: Rethink what we want to do with taken pills
 		Pillsavail[pillIdx].states.switchInstant "taken"
-
+	counter=[0,0,0]
 	# moveUntouchedPills()
 	touchedPillsIdcs = []
 	untouchedPillsIdcs = []
 	Confimation_popup.states.switchInstant "default"
-
+	for i in [0..2]
+		Confirmation_content[i].states.switchInstant "default"	
 moveUntouchedPills = () ->
 	if untouchedPillsIdcs.length != 0
 		for index in untouchedPillsIdcs
